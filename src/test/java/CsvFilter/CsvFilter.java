@@ -15,11 +15,9 @@ public class CsvFilter {
         final String ivaField = fields.get(ivaFieldIndex);
         final String igicField = fields.get(igicFieldIndex);
         final String decimalRegex = "\\d+(\\.\\d+)?";
-        boolean taxFieldsAreMutuallyExclusive =
-                (ivaField.matches(decimalRegex) ||
-                        igicField.matches(decimalRegex)) &&
-                        (!(ivaField.matches(decimalRegex)
-                                && igicField.matches(decimalRegex)));
+        final boolean taxFieldsAreMutuallyExclusive =
+                ((ivaField.matches(decimalRegex) || igicField.matches(decimalRegex)) &&
+                        (ivaField.isBlank() || igicField.isBlank()));
         if (taxFieldsAreMutuallyExclusive) {
             result.add(lines.get(1));
         }
