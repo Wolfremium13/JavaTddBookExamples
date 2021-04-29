@@ -25,4 +25,13 @@ public class CsvFilterShould {
 
         assertThat(result).isEqualTo(List.of(headerLine));
     }
+    @Test
+    public void exclude_lines_with_both_tax_fields_empty_as_one_is_required() {
+        final String headerLine = "Num_factura, Fecha, Bruto, Neto, IVA, IGIC, Concepto, CIF_cliente, NIF_cliente";
+        final String invoiceLine = "1,02/05/2019,1000,810,,,ACER Laptop,B76430134,";
+
+        List<String> result = new CsvFilter().filter(List.of(headerLine, invoiceLine));
+
+        assertThat(result).isEqualTo(List.of(headerLine));
+    }
 }
