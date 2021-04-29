@@ -1,5 +1,6 @@
 package CsvFilter;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -7,47 +8,75 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class CsvFilterShould {
-    final String headerLine = "Num_factura, Fecha, Bruto, Neto, IVA, IGIC, Concepto, CIF_cliente, NIF_cliente";
+    private final String headerLine = "Num_factura, Fecha, Bruto, Neto, IVA, IGIC, Concepto, CIF_cliente, NIF_cliente";
+    CsvFilter filter;
+    FileWithOneInvoiceLineBuilder builder;
+    private final List<String> emptyDataFile = List.of(headerLine);
+    private final String emptyField = "";
+
+    @BeforeEach
+    public void Setup() {
+        filter = new CsvFilter();
+        builder = new FileWithOneInvoiceLineBuilder();
+    }
+
     @Test
     public void allow_for_correct_lines_only() {
-        final String invoiceLine = "1,02/05/2019,100,810,19,,ACER Laptop,B76430134,";
+        List<String> lines = builder
+                .withHeader(headerLine)
+                .withConcept("a correct line with irrelevant data")
+                .generateLines();
 
-        List<String> result = new CsvFilter().filter(List.of(headerLine, invoiceLine));
-
-        assertThat(result).isEqualTo(List.of(headerLine, invoiceLine));
+        List<String> result = filter.apply(lines);
+        assertThat(result).isEqualTo(lines);
     }
+
     @Test
     public void exclude_lines_with_both_tax_fields_populated_as_they_are_exclusive() {
-        final String invoiceLine = "1,02/05/2019,100,810,19,8,ACER Laptop,B76430134,";
+        List<String> result = filter.apply(builder
+                .withHeader(headerLine)
+                .withIvaTax("19")
+                .withIgicTax("8")
+                .generateLines()
+        );
 
-        List<String> result = new CsvFilter().filter(List.of(headerLine, invoiceLine));
-
-        assertThat(result).isEqualTo(List.of(headerLine));
+        assertThat(result).isEqualTo(emptyDataFile);
     }
+
     @Test
     public void exclude_lines_with_both_tax_fields_empty_as_one_is_required() {
-        final String invoiceLine = "1,02/05/2019,1000,810,,,ACER Laptop,B76430134,";
+        List<String> result = filter.apply(builder
+                .withHeader(headerLine)
+                .withIvaTax(emptyField)
+                .withIgicTax(emptyField)
+                .generateLines()
+        );
 
-        List<String> result = new CsvFilter().filter(List.of(headerLine, invoiceLine));
-
-        assertThat(result).isEqualTo(List.of(headerLine));
+        assertThat(result).isEqualTo(emptyDataFile);
     }
 
     @Test
     public void exclude_lines_with_non_decimal_tax_fields() {
-        final String invoiceLine = "1,02/05/2019,1000,810,XYZ,,ACER Laptop,B76430134,";
+        List<String> result = filter.apply(builder
+                .withHeader(headerLine)
+                .withIvaTax("XYZ")
+                .withIgicTax(emptyField)
+                .generateLines()
+        );
 
-        List<String> result = new CsvFilter().filter(List.of(headerLine, invoiceLine));
-
-        assertThat(result).isEqualTo(List.of(headerLine));
+        assertThat(result).isEqualTo(emptyDataFile);
     }
 
     @Test
     public void exclude_lines_with_both_tax_fields_populated_even_if_non_decimal() {
-        final String invoiceLine = "1,02/05/2019,1000,810,XYZ,12,ACER Laptop,B76430134,";
 
-        List<String> result = new CsvFilter().filter(List.of(headerLine, invoiceLine));
+        List<String> result = filter.apply(builder
+                .withHeader(headerLine)
+                .withIvaTax("XYZ")
+                .withIgicTax("12")
+                .generateLines()
+        );
 
-        assertThat(result).isEqualTo(List.of(headerLine));
+        assertThat(result).isEqualTo(emptyDataFile);
     }
 }

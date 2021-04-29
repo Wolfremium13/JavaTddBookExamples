@@ -5,7 +5,7 @@ import java.util.List;
 
 
 public class CsvFilter {
-    public List<String> filter(List<String> lines) {
+    public List<String> apply(List<String> lines) {
         ArrayList<String> result = new ArrayList<>();
         result.add(lines.get(0));
         final String invoice = lines.get(1);
