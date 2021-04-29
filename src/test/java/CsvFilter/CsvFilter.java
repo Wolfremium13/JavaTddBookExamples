@@ -10,8 +10,13 @@ public class CsvFilter {
         result.add(lines.get(0));
         final String invoice = lines.get(1);
         final List<String> fields = List.of(invoice.split(","));
-        if ((fields.get(4).isBlank() || fields.get(5).isBlank()) &&
-                (!(fields.get(4).isBlank() && fields.get(5).isBlank()))) {
+        final int ivaFieldIndex = 4;
+        final int igicFieldIndex = 5;
+        final boolean taxFieldsAreMutuallyExclusive =
+                (fields.get(ivaFieldIndex).isBlank() ||
+                        fields.get(igicFieldIndex).isBlank()) &&
+                        (!(fields.get(ivaFieldIndex).isBlank() && fields.get(igicFieldIndex).isBlank()));
+        if (taxFieldsAreMutuallyExclusive) {
             result.add(lines.get(1));
         }
         return result;
