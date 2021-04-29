@@ -1,5 +1,7 @@
-package CsvFilter;
+package com.tdd.leanmind.test;
 
+import csvfilter.CsvFilter;
+import csvfilter.FileWithOneInvoiceLineBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

@@ -1,8 +1,8 @@
-package CsvFilter;
+package csvfilter;
 
 import java.util.List;
 
-class FileWithOneInvoiceLineBuilder {
+public class FileWithOneInvoiceLineBuilder {
     private final String emptyField = "";
     private String headerLine;
     private String ivaTax = "19";
