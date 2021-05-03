@@ -1,5 +1,6 @@
 package com.tdd.leanmind.test;
 
+import csvfilter.CsvFilter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -7,6 +8,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -21,6 +23,7 @@ import java.io.PrintWriter;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -44,6 +47,9 @@ public class CsvFilterAppShould {
         csvFile.delete();
     }
 
+    @MockBean
+    CsvFilter stubCsvFilter;
+
     @Test
     public void display_lines_after_filtering_csv_file() throws Exception {
         List<String> lines = List.of(
@@ -66,6 +72,20 @@ public class CsvFilterAppShould {
         assertThat(pageSource).contains(lines.get(0));
         assertThat(pageSource).contains(lines.get(1));
         assertThat(pageSource).doesNotContain(lines.get(2));
+    }
+
+
+
+    @Test
+    public void filters_csv_file() {
+        List<String> lines = List.of(
+                "Num_factura, Fecha, Bruto, Neto, IVA, IGIC, Concepto, CIF_cliente, NIF_cliente",
+                "1,02/05/2019,1000,810,19,,ACER Laptop,B76430134,",
+                "2,03/12/2019,1000,2000,19,8,Lenovo Laptop,,78544372A");
+        createCsv(lines);
+        // this is the new line:
+        given(stubCsvFilter.apply(lines)).willReturn(List.of(lines.get(0), lines.get(1)));
+        /* ... same lines here ... */
     }
 
     private void createCsv(List<String> lines) {
