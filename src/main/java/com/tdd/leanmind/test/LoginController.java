@@ -10,26 +10,8 @@ import java.util.List;
 
 @RestController
 public class LoginController {
-    @GetMapping("/login")
-    String showForm() {
-        return "<h2>Login Form</h2>" +
-                "<form>" +
-                "<input type=\"text\" name=\"username\">" +
-                "<input type=\"password\" name=\"password\">" +
-                "<button id=\"submit\" type=\"submit\">Submit</button>" +
-                "</form>";
-    }
 
-    @GetMapping("/csvform")
-    String uploadResult() {
-        return "<h2>File Form</h2>" +
-                "<form enctype=\"multipart/form-data\" method=\"post\" action=\"/csvform\">" +
-                "<input type=\"file\" name=\"file\" id=\"file\">" +
-                "<button id=\"submit\" type=\"submit\">Submit</button>" +
-                "</form>";
-    }
-
-    @PostMapping("/csvform")
+    @PostMapping("/postcsv")
     public @ResponseBody
     String showResult(@RequestPart("file") MultipartFile file) {
         List<String> fileResult = new ArrayList<>();
